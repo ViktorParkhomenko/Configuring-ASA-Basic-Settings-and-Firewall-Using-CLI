@@ -1,5 +1,17 @@
 # Configuring ASA Basic Settings and Firewall Using CLI
 
+Scenario
+Your company has one location connected to an ISP. R1 represents Customer Premises Equipment (CPE)
+device managed by the ISP. R2 represents an intermediate Internet router. R3 represents an ISP that
+connects an administrator from a network management company, who has been hired to remotely manage
+your network. The ASA is an edge CPE security device that connects the internal corporate network and DMZ
+to the ISP while providing NAT and DHCP services to inside hosts. The ASA will be configured for
+management by an administrator on the internal network and by the remote administrator. Layer 3 VLAN
+interfaces provide access to the three areas created in the activity: Inside, Outside, and DMZ. The ISP
+assigned the public IP address space of 209.165.200.224/29, which will be used for address translation on
+the ASA.
+
+
 • Verify connectivity and explore the ASA
 
 ![{424BA683-3CA8-42A8-9DDC-D5A9445337FA}](https://github.com/user-attachments/assets/f50c6396-61dd-47a1-84ef-e8c93470c3a3)
