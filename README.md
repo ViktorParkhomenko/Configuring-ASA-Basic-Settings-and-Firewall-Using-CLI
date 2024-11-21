@@ -17,7 +17,7 @@ the ASA.
 ![{424BA683-3CA8-42A8-9DDC-D5A9445337FA}](https://github.com/user-attachments/assets/f50c6396-61dd-47a1-84ef-e8c93470c3a3)
 
 
-• Configure basic ASA settings and interface security levels using CLI
+Part 2: Configure ASA Settings and Interface Security Using the CLI
 
 Configure the hostname and domain name.
 Configure the ASA hostname as ASA.
@@ -49,8 +49,15 @@ to ping this address
 
 ![{3F12DBB2-DEA4-4337-A05C-FB98320E1D66}](https://github.com/user-attachments/assets/b04facfe-3395-4078-9718-fe3099fe6f37)
 
-
-
+Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
+Configure a static default route for the ASA.
+Configure a default static route on the ASA outside interface to enable the ASA to reach external networks.
+a. Create a “quad zero” default route using the route command, associate it with the ASA outside interface,
+and point to the R1 G0/0 IP address (209.165.200.225) as the gateway of last resort.
+ASA(config)# route outside 0.0.0.0 0.0.0.0 209.165.200.225
+b. Issue the show route command to verify the static default route is in the ASA routing table.
+Verify that the ASA can ping the R1 S0/0/0 IP address 10.1.1.1
+![{9335420C-5822-4CC9-8F92-7DE4A7AD4DA2}](https://github.com/user-attachments/assets/408994ca-d9aa-4422-9086-e2921e98f740)
 
 
 
