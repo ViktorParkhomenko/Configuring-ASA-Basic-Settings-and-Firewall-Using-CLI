@@ -26,6 +26,22 @@ Configure the ASA hostname as ASA.
 Configure the enable mode password.
 Use the enable password command to change the privileged EXEC mode password to cisco
 
+Configure the inside and outside interfaces.
+
+a. Configure a logical VLAN 1 interface for the inside network (192.168.1.0/24) and set the security level to
+the highest setting of 100.
+ASA(config)# interface vlan 1
+ASA(config-if)# nameif inside
+ASA(config-if)# ip address 192.168.1.1 255.255.255.0
+ASA(config-if)# security-level 100
+b. Create a logical VLAN 2 interface for the outside network (209.165.200.224/29), set the security level to
+the lowest setting of 0, and enable the VLAN 2 interface.
+ASA(config-if)# interface vlan 2
+ASA(config-if)# nameif outside
+ASA(config-if)# ip address 209.165.200.226 255.255.255.248
+ASA(config-if)# security-level 0
+
+
 ![{45BF3702-E02B-47CC-B8DF-62E313A78717}](https://github.com/user-attachments/assets/25dc6bfe-2831-4785-82b2-38e4f335eac1)
 
 
