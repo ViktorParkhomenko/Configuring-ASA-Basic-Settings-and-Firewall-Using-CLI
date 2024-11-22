@@ -1,93 +1,94 @@
 # Configuring ASA Basic Settings and Firewall Using CLI
 
-Scenario
-Your company has one location connected to an ISP. R1 represents Customer Premises Equipment (CPE)
-device managed by the ISP. R2 represents an intermediate Internet router. R3 represents an ISP that
-connects an administrator from a network management company, who has been hired to remotely manage
-your network. The ASA is an edge CPE security device that connects the internal corporate network and DMZ
-to the ISP while providing NAT and DHCP services to inside hosts. The ASA will be configured for
-management by an administrator on the internal network and by the remote administrator. Layer 3 VLAN
-interfaces provide access to the three areas created in the activity: Inside, Outside, and DMZ. The ISP
-assigned the public IP address space of 209.165.200.224/29, which will be used for address translation on
-the ASA.
+Project Overview
+This project simulates the configuration of an ASA (Adaptive Security Appliance) in my home lab using Cisco Packet Tracer. The ASA device connects the internal network (Inside), the DMZ, and the ISP (Outside), and provides services such as NAT, DHCP, and Firewall policies.
 
+ASA acts as the firewall, security device, and NAT provider, with interfaces configured for three zones: Inside, Outside, and DMZ.
+Inside network: A private network (192.168.1.0/24) connected to the ASA's Inside interface.
+Outside network: A public IP subnet (209.165.200.224/29) connected to the ASA's Outside interface.
+DMZ network: A network used for a public-facing web server (192.168.2.0/24) connected to the ASA's DMZ interface.
+This setup allows me to practice Basic ASA Configuration, Routing, NAT (PAT), ACLs, SSH, and AAA Authentication.
 
-• Verify connectivity and explore the ASA
+Part 1: Verify Connectivity and Explore the ASA
+Step 1: Test ASA Interface Connectivity
+Ping the Inside Interface (192.168.1.1) from PC-B to verify connectivity. This should be successful.
+
+Ping the Outside Interface (209.165.200.226) from PC-B to confirm it's inaccessible (which should fail due to the default security policy).
 
 ![{424BA683-3CA8-42A8-9DDC-D5A9445337FA}](https://github.com/user-attachments/assets/f50c6396-61dd-47a1-84ef-e8c93470c3a3)
 
 
-Part 2: Configure ASA Settings and Interface Security Using the CLI
+Part 2: Configure ASA Basic Settings and Interface Security Using CLI
+Step 1: Set ASA Hostname and Domain Name
 
-Configure the hostname and domain name.
-Configure the ASA hostname as ASA.
-Configure the enable mode password.
-Use the enable password command to change the privileged EXEC mode password to cisco
+ASA(config)# hostname ASA
+ASA(config)# domain-name ciscosecurity.com
 
-Configure the inside and outside interfaces.
+Step 2: Configure Enable Password
+Set the enable password to ciscoenpa55 for privileged EXEC mode access.
 
-a. Configure a logical VLAN 1 interface for the inside network (192.168.1.0/24) and set the security level to
-the highest setting of 100.
+ASA(config)# enable password ciscoenpa55
+
+Step 3: Configure ASA Interfaces
+Inside Interface Configuration
+The inside interface is configured for the private network (192.168.1.0/24):
+
 ASA(config)# interface vlan 1
 ASA(config-if)# nameif inside
 ASA(config-if)# ip address 192.168.1.1 255.255.255.0
 ASA(config-if)# security-level 100
-b. Create a logical VLAN 2 interface for the outside network (209.165.200.224/29), set the security level to
-the lowest setting of 0, and enable the VLAN 2 interface.
-ASA(config-if)# interface vlan 2
+
+Outside Interface Configuration
+The outside interface is configured for the public network (209.165.200.224/29):
+
+ASA(config)# interface vlan 2
 ASA(config-if)# nameif outside
 ASA(config-if)# ip address 209.165.200.226 255.255.255.248
 ASA(config-if)# security-level 0
 
-
 ![{45BF3702-E02B-47CC-B8DF-62E313A78717}](https://github.com/user-attachments/assets/25dc6bfe-2831-4785-82b2-38e4f335eac1)
 
-Test connectivity to the ASA.
-I should be able to ping from PC-B to the ASA inside interface address (192.168.1.1)
-From PC-B, ping the VLAN 2 (outside) interface at IP address 209.165.200.226. You should not be able
-to ping this address
+Step 4: Verify Interface Configurations
+Test connectivity by:
+
+Pinging the Inside interface (192.168.1.1) from PC-B (ping should succeed).
+
+Attempting to ping the Outside interface (209.165.200.226) from PC-B (ping should fail).
 
 ![{3F12DBB2-DEA4-4337-A05C-FB98320E1D66}](https://github.com/user-attachments/assets/b04facfe-3395-4078-9718-fe3099fe6f37)
 
-Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
+Part 3: Configure Routing, Address Translation, and Inspection Policy
+Step 1: Configure a Static Default Route
+Create a default route to allow the ASA to reach external networks:
 
-Configure a static default route for the ASA.
-Configure a default static route on the ASA outside interface to enable the ASA to reach external networks.
-a. Create a “quad zero” default route using the route command, associate it with the ASA outside interface,
-and point to the R1 G0/0 IP address (209.165.200.225) as the gateway of last resort.
 ASA(config)# route outside 0.0.0.0 0.0.0.0 209.165.200.225
-b. Issue the show route command to verify the static default route is in the ASA routing table.
-Verify that the ASA can ping the R1 S0/0/0 IP address 10.1.1.1
+
+Verify the static route by checking the routing table:
+
+ASA(config)# show route
+
+Ping the R1 G0/0 interface (10.1.1.1) to ensure external connectivity:
+
 ![{9335420C-5822-4CC9-8F92-7DE4A7AD4DA2}](https://github.com/user-attachments/assets/408994ca-d9aa-4422-9086-e2921e98f740)
 
-Configure address translation using PAT and network objects.
-Create network object inside-net and assign attributes to it using the subnet and nat commands.
+Step 2: Configure PAT and Network Objects
+Configure PAT (Port Address Translation) for the Inside network, so internal devices can share the ASA's outside IP address:
 
 ASA(config)# object network inside-net
 ASA(config-network-object)# subnet 192.168.1.0 255.255.255.0
 ASA(config-network-object)# nat (inside,outside) dynamic interface
 ASA(config-network-object)# end
 
-The ASA splits the configuration into the object portion that defines the network to be translated and the
-actual nat command parameters. These appear in two different places in the running configuration.
+Verify the NAT translation hits by running:
+
+ASA(config)# show nat
 
 ![{A93DCFF0-C02E-4095-86DF-14DDFD3B5F64}](https://github.com/user-attachments/assets/9290ad6c-160e-4f77-aa6d-13aadd442b9a)
 
-From PC-B attempt to ping the R1 G0/0 interface at IP address 209.165.200.225. The pings should fail.
+Try to ping R1 G0/0 IP (209.165.200.225) from PC-B to observe that the pings fail due to the default security policy.
 
-Issue the show nat command on the ASA to see the translated and untranslated hits. Notice that, of the
-pings from PC-B, four were translated and four were not. The outgoing pings (echos) were translated and
-sent to the destination. The returning echo replies were blocked by the firewall policy. You will configure
-the default inspection policy to allow ICMP in Step 3 of this part of the activity.
-
- Modify the default MPF application inspection global service policy.
-For application layer inspection and other advanced options, the Cisco MPF is available on ASAs.
-The Packet Tracer ASA device does not have an MPF policy map in place by default. As a modification, we
-can create the default policy map that will perform the inspection on inside-to-outside traffic. When configured
-correctly only traffic initiated from the inside is allowed back in to the outside interface. You will need to add
-ICMP to the inspection list.
-a. Create the class-map, policy-map, and service-policy. Add the inspection of ICMP traffic to the policy map
-list using the following commands:
+Step 3: Modify MPF (Modular Policy Framework) to Allow ICMP
+To allow ICMP (ping) replies, modify the ASA’s MPF policy to inspect ICMP traffic:
 
 ASA(config)# class-map inspection_default
 ASA(config-cmap)# match default-inspection-traffic
@@ -98,69 +99,193 @@ ASA(config-pmap-c)# inspect icmp
 ASA(config-pmap-c)# exit
 ASA(config)# service-policy global_policy global
 
-From PC-B, attempt to ping the R1 G0/0 interface at IP address 209.165.200.225. The pings should be
-successful this time because ICMP traffic is now being inspected and legitimate return traffic is being
-allowed. If the pings fail, troubleshoot your configurations.
+Test by pinging R1 G0/0 IP again. This time, the pings should succeed.
 
 ![{A97F0F5C-06F4-4B5C-BD3B-7BB7DB397AB6}](https://github.com/user-attachments/assets/64e3d0e8-6b5b-4a45-9d6d-61a57ebaa9ad)
 
 Part 4: Configure DHCP, AAA, and SSH
-Configure the ASA as a DHCP server
+Step 1: Configure DHCP on the ASA
+Set up a DHCP server for the Inside network:
 
 ASA(config)# dhcpd address 192.168.1.5-192.168.1.36 inside
 ASA(config)# dhcpd dns 8.8.8.8 interface inside
 ASA(config)# dhcpd enable inside
 
-Change PC-A and PC-B from a static IP address to a DHCP client, and verify that it receives IP addressing
-information.
-![{0F1B589B-FFA5-416A-9F0D-ED70BF20349D}](https://github.com/user-attachments/assets/df979fe7-4f18-448d-bb2c-416b7095e4fd)
-
-Configure AAA to use the local database for authentication
+Step 2: Configure AAA Authentication Using the Local Database
+Set up AAA (Authentication, Authorization, and Accounting) for SSH login using the local database:
 
 ASA(config)# username admin password adminpa55
 ASA(config)# aaa authentication ssh console LOCAL
 
-Configure remote access to the ASA.
-
-The ASA can be configured to accept connections from a single host or a range of hosts on the inside or
-outside network. In this step, hosts from the outside network can only use SSH to communicate with the ASA.
-SSH sessions can be used to access the ASA from the inside network.
-a. Generate an RSA key pair, which is required to support SSH connections. Because the ASA device has
-RSA keys already in place, enter no when prompted to replace them.
+Step 3: Configure SSH Access to ASA
+Generate an RSA key pair for SSH connections:
 
 ASA(config)# crypto key generate rsa modulus 1024
 
-b. Configure the ASA to allow SSH connections from any host on the inside network (192.168.1.0/24) and
-from the remote management host at the branch office (172.16.3.3) on the outside network. Set the SSH
-timeout to 10 minutes (the default is 5 minutes).
+Allow SSH access from the Inside network (192.168.1.0/24) and a remote management host (172.16.3.3) on the Outside network:
 
 ASA(config)# ssh 192.168.1.0 255.255.255.0 inside
 ASA(config)# ssh 172.16.3.3 255.255.255.255 outside
 ASA(config)# ssh timeout 10
 
-c. Establish an SSH session from PC-C to the ASA (209.165.200.226).
-PC> ssh -l admin 209.165.200.226
+Test SSH access from PC-C to the ASA’s Outside IP (209.165.200.226) and PC-B to the Inside IP (192.168.1.1).
 
 ![{CB3F47B6-454F-4FCB-A84E-D0631BEBBAF5}](https://github.com/user-attachments/assets/072441d9-75ed-4113-b20e-bc48531842c9)
 
-d. Establish an SSH session from PC-B to the ASA (192.168.1.1). Troubleshoot if it is not successful.
-PC> ssh -l admin 192.168.1.1
-
 ![{28339A80-9C8D-4E71-A14E-053B3C1341BD}](https://github.com/user-attachments/assets/8e0b7c59-963d-4d4d-a44b-1f57917bee60)
 
-Part 5: Configure a DMZ, Static NAT, and ACLs
 
-Step 1: Configure the DMZ interface VLAN 3 on the ASA.
-a. Configure DMZ VLAN 3, which is where the public access web server will reside. Assign it IP address
-192.168.2.1/24, name it dmz, and assign it a security level of 70. Because the server does not need to
-initiate communication with the inside users, disable forwarding to interface VLAN 1.
+Got it! Here's the revised version of your project documentation, now phrased to reflect that it's a home lab project done using Cisco Packet Tracer, while maintaining a smooth flow and keeping the details consistent with the screenshots you provided:
+
+Configuring ASA Basic Settings and Firewall Using CLI (Home Lab Project)
+Project Overview
+This project simulates the configuration of an ASA (Adaptive Security Appliance) in my home lab using Cisco Packet Tracer. The ASA device connects the internal network (Inside), the DMZ, and the ISP (Outside), and provides services such as NAT, DHCP, and Firewall policies.
+
+ASA acts as the firewall, security device, and NAT provider, with interfaces configured for three zones: Inside, Outside, and DMZ.
+Inside network: A private network (192.168.1.0/24) connected to the ASA's Inside interface.
+Outside network: A public IP subnet (209.165.200.224/29) connected to the ASA's Outside interface.
+DMZ network: A network used for a public-facing web server (192.168.2.0/24) connected to the ASA's DMZ interface.
+This setup allows me to practice Basic ASA Configuration, Routing, NAT (PAT), ACLs, SSH, and AAA Authentication.
+
+Part 1: Verify Connectivity and Explore the ASA
+Step 1: Test ASA Interface Connectivity
+Ping the Inside Interface (192.168.1.1) from PC-B to verify connectivity. This should be successful.
+
+Ping the Outside Interface (209.165.200.226) from PC-B to confirm it's inaccessible (which should fail due to the default security policy).
+
+
+
+Part 2: Configure ASA Basic Settings and Interface Security Using CLI
+Step 1: Set ASA Hostname and Domain Name
+bash
+Copy code
+ASA(config)# hostname ASA
+ASA(config)# domain-name home-lab.com
+Step 2: Configure Enable Password
+Set the enable password to cisco for privileged EXEC mode access.
+
+bash
+Copy code
+ASA(config)# enable password cisco
+Step 3: Configure ASA Interfaces
+Inside Interface Configuration
+The inside interface is configured for the private network (192.168.1.0/24):
+
+bash
+Copy code
+ASA(config)# interface vlan 1
+ASA(config-if)# nameif inside
+ASA(config-if)# ip address 192.168.1.1 255.255.255.0
+ASA(config-if)# security-level 100
+Outside Interface Configuration
+The outside interface is configured for the public network (209.165.200.224/29):
+
+bash
+Copy code
+ASA(config)# interface vlan 2
+ASA(config-if)# nameif outside
+ASA(config-if)# ip address 209.165.200.226 255.255.255.248
+ASA(config-if)# security-level 0
+Step 4: Verify Interface Configurations
+Test connectivity by:
+
+Pinging the Inside interface (192.168.1.1) from PC-B (ping should succeed).
+
+Attempting to ping the Outside interface (209.165.200.226) from PC-B (ping should fail).
+
+
+
+Part 3: Configure Routing, Address Translation, and Inspection Policy
+Step 1: Configure a Static Default Route
+Create a default route to allow the ASA to reach external networks:
+
+bash
+Copy code
+ASA(config)# route outside 0.0.0.0 0.0.0.0 209.165.200.225
+Verify the static route by checking the routing table:
+
+bash
+Copy code
+ASA(config)# show route
+Ping the R1 G0/0 interface (10.1.1.1) to ensure external connectivity:
+
+
+
+Step 2: Configure PAT and Network Objects
+Configure PAT (Port Address Translation) for the Inside network, so internal devices can share the ASA's outside IP address:
+
+bash
+Copy code
+ASA(config)# object network inside-net
+ASA(config-network-object)# subnet 192.168.1.0 255.255.255.0
+ASA(config-network-object)# nat (inside,outside) dynamic interface
+ASA(config-network-object)# end
+Verify the NAT translation hits by running:
+
+bash
+Copy code
+ASA(config)# show nat
+Try to ping R1 G0/0 IP (209.165.200.225) from PC-B to observe that the pings fail due to the default security policy.
+
+Step 3: Modify MPF (Modular Policy Framework) to Allow ICMP
+To allow ICMP (ping) replies, modify the ASA’s MPF policy to inspect ICMP traffic:
+
+bash
+Copy code
+ASA(config)# class-map inspection_default
+ASA(config-cmap)# match default-inspection-traffic
+ASA(config-cmap)# exit
+ASA(config)# policy-map global_policy
+ASA(config-pmap)# class inspection_default
+ASA(config-pmap-c)# inspect icmp
+ASA(config-pmap-c)# exit
+ASA(config)# service-policy global_policy global
+Test by pinging R1 G0/0 IP again. This time, the pings should succeed.
+
+
+
+Part 4: Configure DHCP, AAA, and SSH
+Step 1: Configure DHCP on the ASA
+Set up a DHCP server for the Inside network:
+
+bash
+Copy code
+ASA(config)# dhcpd address 192.168.1.5-192.168.1.36 inside
+ASA(config)# dhcpd dns 8.8.8.8 interface inside
+ASA(config)# dhcpd enable inside
+Step 2: Configure AAA Authentication Using the Local Database
+Set up AAA (Authentication, Authorization, and Accounting) for SSH login using the local database:
+
+bash
+Copy code
+ASA(config)# username admin password adminpa55
+ASA(config)# aaa authentication ssh console LOCAL
+Step 3: Configure SSH Access to ASA
+Generate an RSA key pair for SSH connections:
+
+bash
+Copy code
+ASA(config)# crypto key generate rsa modulus 1024
+Allow SSH access from the Inside network (192.168.1.0/24) and a remote management host (172.16.3.3) on the Outside network:
+
+bash
+Copy code
+ASA(config)# ssh 192.168.1.0 255.255.255.0 inside
+ASA(config)# ssh 172.16.3.3 255.255.255.255 outside
+ASA(config)# ssh timeout 10
+Test SSH access from PC-C to the ASA’s Outside IP (209.165.200.226) and PC-B to the Inside IP (192.168.1.1).
+
+
+
+Part 5: Configure DMZ, Static NAT, and ACLs
+Step 1: Configure the DMZ Interface
+Configure VLAN 3 for the DMZ and assign it the IP address 192.168.2.1/24:
 
 ASA(config)# interface vlan 3
 ASA(config-if)# ip address 192.168.2.1 255.255.255.0
 ASA(config-if)# no forward interface vlan 1
 ASA(config-if)# nameif dmz
 ASA(config-if)# security-level 70
-
 
 b. Assign ASA physical interface E0/2 to DMZ VLAN 3 and enable the interface.
 
