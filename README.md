@@ -49,7 +49,7 @@ to ping this address
 
 ![{3F12DBB2-DEA4-4337-A05C-FB98320E1D66}](https://github.com/user-attachments/assets/b04facfe-3395-4078-9718-fe3099fe6f37)
 
-#Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
+Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
 
 Configure a static default route for the ASA.
 Configure a default static route on the ASA outside interface to enable the ASA to reach external networks.
@@ -104,12 +104,49 @@ allowed. If the pings fail, troubleshoot your configurations.
 
 ![{A97F0F5C-06F4-4B5C-BD3B-7BB7DB397AB6}](https://github.com/user-attachments/assets/64e3d0e8-6b5b-4a45-9d6d-61a57ebaa9ad)
 
-#Part 4: Configure DHCP, AAA, and SSH
+Part 4: Configure DHCP, AAA, and SSH
+Configure the ASA as a DHCP server
 
+ASA(config)# dhcpd address 192.168.1.5-192.168.1.36 inside
+ASA(config)# dhcpd dns 8.8.8.8 interface inside
+ASA(config)# dhcpd enable inside
 
+Change PC-A and PC-B from a static IP address to a DHCP client, and verify that it receives IP addressing
+information.
+![{0F1B589B-FFA5-416A-9F0D-ED70BF20349D}](https://github.com/user-attachments/assets/df979fe7-4f18-448d-bb2c-416b7095e4fd)
 
+Configure AAA to use the local database for authentication
 
+ASA(config)# username admin password adminpa55
+ASA(config)# aaa authentication ssh console LOCAL
 
+Configure remote access to the ASA.
 
+The ASA can be configured to accept connections from a single host or a range of hosts on the inside or
+outside network. In this step, hosts from the outside network can only use SSH to communicate with the ASA.
+SSH sessions can be used to access the ASA from the inside network.
+a. Generate an RSA key pair, which is required to support SSH connections. Because the ASA device has
+RSA keys already in place, enter no when prompted to replace them.
 
-• Configure a DMZ, Static NAT, and ACLs
+ASA(config)# crypto key generate rsa modulus 1024
+
+b. Configure the ASA to allow SSH connections from any host on the inside network (192.168.1.0/24) and
+from the remote management host at the branch office (172.16.3.3) on the outside network. Set the SSH
+timeout to 10 minutes (the default is 5 minutes).
+
+ASA(config)# ssh 192.168.1.0 255.255.255.0 inside
+ASA(config)# ssh 172.16.3.3 255.255.255.255 outside
+ASA(config)# ssh timeout 10
+
+c. Establish an SSH session from PC-C to the ASA (209.165.200.226).
+PC> ssh -l admin 209.165.200.226
+
+![{CB3F47B6-454F-4FCB-A84E-D0631BEBBAF5}](https://github.com/user-attachments/assets/072441d9-75ed-4113-b20e-bc48531842c9)
+
+d. Establish an SSH session from PC-B to the ASA (192.168.1.1). Troubleshoot if it is not successful.
+PC> ssh -l admin 192.168.1.1
+
+![{28339A80-9C8D-4E71-A14E-053B3C1341BD}](https://github.com/user-attachments/assets/8e0b7c59-963d-4d4d-a44b-1f57917bee60)
+
+Part 5: Configure a DMZ, Static NAT, and ACLs
+
