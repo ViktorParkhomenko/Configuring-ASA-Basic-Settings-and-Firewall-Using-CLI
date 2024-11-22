@@ -149,24 +149,26 @@ PC> ssh -l admin 192.168.1.1
 ![{28339A80-9C8D-4E71-A14E-053B3C1341BD}](https://github.com/user-attachments/assets/8e0b7c59-963d-4d4d-a44b-1f57917bee60)
 
 Part 5: Configure a DMZ, Static NAT, and ACLs
+
 Step 1: Configure the DMZ interface VLAN 3 on the ASA.
 a. Configure DMZ VLAN 3, which is where the public access web server will reside. Assign it IP address
 192.168.2.1/24, name it dmz, and assign it a security level of 70. Because the server does not need to
 initiate communication with the inside users, disable forwarding to interface VLAN 1.
+
 ASA(config)# interface vlan 3
 ASA(config-if)# ip address 192.168.2.1 255.255.255.0
 ASA(config-if)# no forward interface vlan 1
 ASA(config-if)# nameif dmz
-INFO: Security level for "dmz" set to 0 by default.
 ASA(config-if)# security-level 70
+
+
 b. Assign ASA physical interface E0/2 to DMZ VLAN 3 and enable the interface.
+
 ASA(config)# interface Ethernet0/2
 ASA(config-if)# switchport access vlan 3
-c. Use the following verification commands to check your configurations:
-1) Use the show interface ip brief command to display the status for all ASA interfaces.
-2) Use the show ip address command to display the information for the Layer 3 VLAN interfaces.
-3) Use the show switch vlan command to display the inside and outside VLANs configured on the ASA
-and to display the assigned ports.
+
+![{A997FD2F-34AA-494D-A590-CBC3EC78F37B}](https://github.com/user-attachments/assets/974d96c2-5a7e-40e7-a18d-ff6747fb156c)
+
 Step 2: Configure static NAT to the DMZ server using a network object.
 Configure a network object named dmz-server and assign it the static IP address of the DMZ server
 (192.168.2.3). While in object definition mode, use the nat command to specify that this object is used to
