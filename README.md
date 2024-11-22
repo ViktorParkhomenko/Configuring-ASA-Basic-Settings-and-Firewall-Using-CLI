@@ -49,7 +49,7 @@ to ping this address
 
 ![{3F12DBB2-DEA4-4337-A05C-FB98320E1D66}](https://github.com/user-attachments/assets/b04facfe-3395-4078-9718-fe3099fe6f37)
 
-Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
+#Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
 
 Configure a static default route for the ASA.
 Configure a default static route on the ASA outside interface to enable the ASA to reach external networks.
@@ -61,14 +61,55 @@ Verify that the ASA can ping the R1 S0/0/0 IP address 10.1.1.1
 ![{9335420C-5822-4CC9-8F92-7DE4A7AD4DA2}](https://github.com/user-attachments/assets/408994ca-d9aa-4422-9086-e2921e98f740)
 
 Configure address translation using PAT and network objects.
+Create network object inside-net and assign attributes to it using the subnet and nat commands.
+
+ASA(config)# object network inside-net
+ASA(config-network-object)# subnet 192.168.1.0 255.255.255.0
+ASA(config-network-object)# nat (inside,outside) dynamic interface
+ASA(config-network-object)# end
+
+The ASA splits the configuration into the object portion that defines the network to be translated and the
+actual nat command parameters. These appear in two different places in the running configuration.
+
+![{A93DCFF0-C02E-4095-86DF-14DDFD3B5F64}](https://github.com/user-attachments/assets/9290ad6c-160e-4f77-aa6d-13aadd442b9a)
+
+From PC-B attempt to ping the R1 G0/0 interface at IP address 209.165.200.225. The pings should fail.
+
+Issue the show nat command on the ASA to see the translated and untranslated hits. Notice that, of the
+pings from PC-B, four were translated and four were not. The outgoing pings (echos) were translated and
+sent to the destination. The returning echo replies were blocked by the firewall policy. You will configure
+the default inspection policy to allow ICMP in Step 3 of this part of the activity.
+
+ Modify the default MPF application inspection global service policy.
+For application layer inspection and other advanced options, the Cisco MPF is available on ASAs.
+The Packet Tracer ASA device does not have an MPF policy map in place by default. As a modification, we
+can create the default policy map that will perform the inspection on inside-to-outside traffic. When configured
+correctly only traffic initiated from the inside is allowed back in to the outside interface. You will need to add
+ICMP to the inspection list.
+a. Create the class-map, policy-map, and service-policy. Add the inspection of ICMP traffic to the policy map
+list using the following commands:
+
+ASA(config)# class-map inspection_default
+ASA(config-cmap)# match default-inspection-traffic
+ASA(config-cmap)# exit
+ASA(config)# policy-map global_policy
+ASA(config-pmap)# class inspection_default
+ASA(config-pmap-c)# inspect icmp
+ASA(config-pmap-c)# exit
+ASA(config)# service-policy global_policy global
+
+From PC-B, attempt to ping the R1 G0/0 interface at IP address 209.165.200.225. The pings should be
+successful this time because ICMP traffic is now being inspected and legitimate return traffic is being
+allowed. If the pings fail, troubleshoot your configurations.
+
+![{A97F0F5C-06F4-4B5C-BD3B-7BB7DB397AB6}](https://github.com/user-attachments/assets/64e3d0e8-6b5b-4a45-9d6d-61a57ebaa9ad)
+
+#Part 4: Configure DHCP, AAA, and SSH
 
 
 
 
 
 
-• Configure routing, address translation, and inspection policy using CLI
-
-• Configure DHCP, AAA, and SSH
 
 • Configure a DMZ, Static NAT, and ACLs
