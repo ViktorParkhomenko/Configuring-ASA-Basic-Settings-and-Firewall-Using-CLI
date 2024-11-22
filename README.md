@@ -15,6 +15,7 @@ Part 1: Verify Connectivity and Explore the ASA
 Step 1: Test ASA Interface Connectivity
 Ping the Inside Interface (192.168.1.1) from PC-B to verify connectivity. This should be successful.
 Ping the Outside Interface (209.165.200.226) from PC-B to confirm it's inaccessible (which should fail due to the default security policy).
+
 Part 2: Configure ASA Basic Settings and Interface Security Using CLI
 Step 1: Set ASA Hostname and Domain Name
 
