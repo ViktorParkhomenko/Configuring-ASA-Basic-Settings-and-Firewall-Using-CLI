@@ -19,8 +19,8 @@ Ping the Outside Interface (209.165.200.226) from PC-B to confirm it's inaccessi
 Part 2: Configure ASA Basic Settings and Interface Security Using CLI
 Step 1: Set ASA Hostname and Domain Name
 
-\n ASA(config)# hostname ASA
-\n ASA(config)# domain-name ciscosecurity.com
+\r ASA(config)# hostname ASA
+\r ASA(config)# domain-name ciscosecurity.com
 
 Step 2: Configure Enable Password
 Set the enable password to ciscoenpa55 for privileged EXEC mode access.
