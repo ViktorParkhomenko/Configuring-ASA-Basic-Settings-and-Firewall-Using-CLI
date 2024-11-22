@@ -20,6 +20,7 @@ Part 2: Configure ASA Basic Settings and Interface Security Using CLI
 Step 1: Set ASA Hostname and Domain Name
 
 ASA(config)# hostname ASA
+
 ASA(config)# domain-name ciscosecurity.com
 
 Step 2: Configure Enable Password
