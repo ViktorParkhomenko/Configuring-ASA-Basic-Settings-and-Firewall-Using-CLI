@@ -174,6 +174,7 @@ Configure a network object named dmz-server and assign it the static IP address 
 (192.168.2.3). While in object definition mode, use the nat command to specify that this object is used to
 translate a DMZ address to an outside address using static NAT, and specify a public translated address of
 209.165.200.227.
+
 ASA(config)# object network dmz-server
 ASA(config-network-object)# host 192.168.2.3
 ASA(config-network-object)# nat (dmz,outside) static 209.165.200.227
@@ -183,12 +184,15 @@ Step 3: Configure an ACL to allow access to the DMZ server from the Internet.
 Configure a named access list OUTSIDE-DMZ that permits the TCP protocol on port 80 from any external
 host to the internal IP address of the DMZ server. Apply the access list to the ASA outside interface in the “IN”
 direction.
+
 ASA(config)# access-list OUTSIDE-DMZ permit icmp any host 192.168.2.3
 ASA(config)# access-list OUTSIDE-DMZ permit tcp any host 192.168.2.3 eq 80
 ASA(config)# access-group OUTSIDE-DMZ in interface outside
+
 Note: Unlike IOS ACLs, the ASA ACL permit statement must permit access to the internal private DMZ
 address. External hosts access the server using its public static NAT address, the ASA translates it to the
 internal host IP address, and then applies the ACL.
+
 Step 4: Test access to the DMZ server.
 Test outside access to the DMZ - launch a ping test to the DMZ server to check for connectivity. Then, try and
 get to the web server from PC-C.
