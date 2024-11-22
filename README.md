@@ -9,15 +9,12 @@ Outside network: A public IP subnet (209.165.200.224/29) connected to the ASA's 
 DMZ network: A network used for a public-facing web server (192.168.2.0/24) connected to the ASA's DMZ interface.
 This setup allows me to practice Basic ASA Configuration, Routing, NAT (PAT), ACLs, SSH, and AAA Authentication.
 
+![{424BA683-3CA8-42A8-9DDC-D5A9445337FA}](https://github.com/user-attachments/assets/f50c6396-61dd-47a1-84ef-e8c93470c3a3)
+
 Part 1: Verify Connectivity and Explore the ASA
 Step 1: Test ASA Interface Connectivity
 Ping the Inside Interface (192.168.1.1) from PC-B to verify connectivity. This should be successful.
-
 Ping the Outside Interface (209.165.200.226) from PC-B to confirm it's inaccessible (which should fail due to the default security policy).
-
-![{424BA683-3CA8-42A8-9DDC-D5A9445337FA}](https://github.com/user-attachments/assets/f50c6396-61dd-47a1-84ef-e8c93470c3a3)
-
-
 Part 2: Configure ASA Basic Settings and Interface Security Using CLI
 Step 1: Set ASA Hostname and Domain Name
 
