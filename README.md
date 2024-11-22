@@ -197,5 +197,8 @@ Step 4: Test access to the DMZ server.
 Test outside access to the DMZ - launch a ping test to the DMZ server to check for connectivity. Then, try and
 get to the web server from PC-C.
 
+![{7F8E03DB-3993-4C2B-991C-40F0FF5AA59C}](https://github.com/user-attachments/assets/4776a7ad-c9e8-4dbd-b823-2cc32a475283)
+
+![{DFA4FE8E-3B57-469F-BFC7-E9757BF4A6F3}](https://github.com/user-attachments/assets/ddf568f3-6230-416c-8796-77bcd7abd44a)
 
 
