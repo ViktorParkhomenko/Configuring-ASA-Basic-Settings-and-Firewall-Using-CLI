@@ -216,6 +216,7 @@ get to the web server from PC-C.
 ![{DFA4FE8E-3B57-469F-BFC7-E9757BF4A6F3}](https://github.com/user-attachments/assets/ddf568f3-6230-416c-8796-77bcd7abd44a)
 
 Conclusion
+
 This project successfully demonstrates the configuration of a Cisco ASA using CLI to implement a secure and functional network environment. The ASA was configured to handle critical roles such as NAT, DHCP, and firewall policies while enabling secure access to internal, external, and DMZ zones. By completing this project, I gained hands-on experience in configuring essential ASA features like routing, PAT, ACLs, AAA authentication, and SSH.
 
 The integration of a DMZ and static NAT configuration to support a public-facing web server highlights the ASA's capabilities in balancing security and accessibility. Through extensive testing and verification, including connectivity checks and policy inspections, the ASA configuration proved to be effective and robust.
