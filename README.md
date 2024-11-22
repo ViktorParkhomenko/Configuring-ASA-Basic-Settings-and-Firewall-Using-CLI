@@ -50,6 +50,7 @@ to ping this address
 ![{3F12DBB2-DEA4-4337-A05C-FB98320E1D66}](https://github.com/user-attachments/assets/b04facfe-3395-4078-9718-fe3099fe6f37)
 
 Part 3: Configure Routing, Address Translation, and Inspection Policy Using the CLI
+
 Configure a static default route for the ASA.
 Configure a default static route on the ASA outside interface to enable the ASA to reach external networks.
 a. Create a “quad zero” default route using the route command, associate it with the ASA outside interface,
@@ -58,6 +59,8 @@ ASA(config)# route outside 0.0.0.0 0.0.0.0 209.165.200.225
 b. Issue the show route command to verify the static default route is in the ASA routing table.
 Verify that the ASA can ping the R1 S0/0/0 IP address 10.1.1.1
 ![{9335420C-5822-4CC9-8F92-7DE4A7AD4DA2}](https://github.com/user-attachments/assets/408994ca-d9aa-4422-9086-e2921e98f740)
+
+Configure address translation using PAT and network objects.
 
 
 
