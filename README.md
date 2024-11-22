@@ -19,8 +19,9 @@ Ping the Outside Interface (209.165.200.226) from PC-B to confirm it's inaccessi
 Part 2: Configure ASA Basic Settings and Interface Security Using CLI
 Step 1: Set ASA Hostname and Domain Name
 
-\r ASA(config)# hostname ASA
-\r ASA(config)# domain-name ciscosecurity.com
+ASA(config)# hostname ASA
+
+ASA(config)# domain-name ciscosecurity.com
 
 Step 2: Configure Enable Password
 Set the enable password to ciscoenpa55 for privileged EXEC mode access.
@@ -32,16 +33,22 @@ Inside Interface Configuration
 The inside interface is configured for the private network (192.168.1.0/24):
 
 ASA(config)# interface vlan 1
+
 ASA(config-if)# nameif inside
+
 ASA(config-if)# ip address 192.168.1.1 255.255.255.0
+
 ASA(config-if)# security-level 100
 
 Outside Interface Configuration
 The outside interface is configured for the public network (209.165.200.224/29):
 
 ASA(config)# interface vlan 2
+
 ASA(config-if)# nameif outside
+
 ASA(config-if)# ip address 209.165.200.226 255.255.255.248
+
 ASA(config-if)# security-level 0
 
 ![{45BF3702-E02B-47CC-B8DF-62E313A78717}](https://github.com/user-attachments/assets/25dc6bfe-2831-4785-82b2-38e4f335eac1)
