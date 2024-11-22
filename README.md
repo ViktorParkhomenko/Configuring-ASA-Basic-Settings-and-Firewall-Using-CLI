@@ -80,13 +80,16 @@ Step 2: Configure PAT and Network Objects
 Configure PAT (Port Address Translation) for the Inside network, so internal devices can share the ASA's outside IP address:
 
 ASA(config)# object network inside-net
+
 ASA(config-network-object)# subnet 192.168.1.0 255.255.255.0
+
 ASA(config-network-object)# nat (inside,outside) dynamic interface
+
 ASA(config-network-object)# end
 
 Verify the NAT translation hits by running:
 
-ASA(config)# show nat
+ASA(config)# show run
 
 ![{A93DCFF0-C02E-4095-86DF-14DDFD3B5F64}](https://github.com/user-attachments/assets/9290ad6c-160e-4f77-aa6d-13aadd442b9a)
 
@@ -96,12 +99,19 @@ Step 3: Modify MPF (Modular Policy Framework) to Allow ICMP
 To allow ICMP (ping) replies, modify the ASA’s MPF policy to inspect ICMP traffic:
 
 ASA(config)# class-map inspection_default
+
 ASA(config-cmap)# match default-inspection-traffic
+
 ASA(config-cmap)# exit
+
 ASA(config)# policy-map global_policy
+
 ASA(config-pmap)# class inspection_default
+
 ASA(config-pmap-c)# inspect icmp
+
 ASA(config-pmap-c)# exit
+
 ASA(config)# service-policy global_policy global
 
 Test by pinging R1 G0/0 IP again. This time, the pings should succeed.
@@ -113,13 +123,16 @@ Step 1: Configure DHCP on the ASA
 Set up a DHCP server for the Inside network:
 
 ASA(config)# dhcpd address 192.168.1.5-192.168.1.36 inside
+
 ASA(config)# dhcpd dns 8.8.8.8 interface inside
+
 ASA(config)# dhcpd enable inside
 
 Step 2: Configure AAA Authentication Using the Local Database
 Set up AAA (Authentication, Authorization, and Accounting) for SSH login using the local database:
 
 ASA(config)# username admin password adminpa55
+
 ASA(config)# aaa authentication ssh console LOCAL
 
 Step 3: Configure SSH Access to ASA
@@ -130,7 +143,9 @@ ASA(config)# crypto key generate rsa modulus 1024
 Allow SSH access from the Inside network (192.168.1.0/24) and a remote management host (172.16.3.3) on the Outside network:
 
 ASA(config)# ssh 192.168.1.0 255.255.255.0 inside
+
 ASA(config)# ssh 172.16.3.3 255.255.255.255 outside
+
 ASA(config)# ssh timeout 10
 
 Test SSH access from PC-C to the ASA’s Outside IP (209.165.200.226) and PC-B to the Inside IP (192.168.1.1).
@@ -149,15 +164,20 @@ a. Configure DMZ VLAN 3, which is where the public access web server will reside
 initiate communication with the inside users, disable forwarding to interface VLAN 1.
 
 ASA(config)# interface vlan 3
+
 ASA(config-if)# ip address 192.168.2.1 255.255.255.0
+
 ASA(config-if)# no forward interface vlan 1
+
 ASA(config-if)# nameif dmz
+
 ASA(config-if)# security-level 70
 
 
 b. Assign ASA physical interface E0/2 to DMZ VLAN 3 and enable the interface.
 
 ASA(config)# interface Ethernet0/2
+
 ASA(config-if)# switchport access vlan 3
 
 ![{A997FD2F-34AA-494D-A590-CBC3EC78F37B}](https://github.com/user-attachments/assets/974d96c2-5a7e-40e7-a18d-ff6747fb156c)
@@ -169,8 +189,11 @@ translate a DMZ address to an outside address using static NAT, and specify a pu
 209.165.200.227.
 
 ASA(config)# object network dmz-server
+
 ASA(config-network-object)# host 192.168.2.3
+
 ASA(config-network-object)# nat (dmz,outside) static 209.165.200.227
+
 ASA(config-network-object)# exit
 
 Step 3: Configure an ACL to allow access to the DMZ server from the Internet.
@@ -179,12 +202,10 @@ host to the internal IP address of the DMZ server. Apply the access list to the 
 direction.
 
 ASA(config)# access-list OUTSIDE-DMZ permit icmp any host 192.168.2.3
-ASA(config)# access-list OUTSIDE-DMZ permit tcp any host 192.168.2.3 eq 80
-ASA(config)# access-group OUTSIDE-DMZ in interface outside
 
-Note: Unlike IOS ACLs, the ASA ACL permit statement must permit access to the internal private DMZ
-address. External hosts access the server using its public static NAT address, the ASA translates it to the
-internal host IP address, and then applies the ACL.
+ASA(config)# access-list OUTSIDE-DMZ permit tcp any host 192.168.2.3 eq 80
+
+ASA(config)# access-group OUTSIDE-DMZ in interface outside
 
 Step 4: Test access to the DMZ server.
 Test outside access to the DMZ - launch a ping test to the DMZ server to check for connectivity. Then, try and
@@ -193,3 +214,10 @@ get to the web server from PC-C.
 ![{7F8E03DB-3993-4C2B-991C-40F0FF5AA59C}](https://github.com/user-attachments/assets/4776a7ad-c9e8-4dbd-b823-2cc32a475283)
 
 ![{DFA4FE8E-3B57-469F-BFC7-E9757BF4A6F3}](https://github.com/user-attachments/assets/ddf568f3-6230-416c-8796-77bcd7abd44a)
+
+Conclusion
+This project successfully demonstrates the configuration of a Cisco ASA using CLI to implement a secure and functional network environment. The ASA was configured to handle critical roles such as NAT, DHCP, and firewall policies while enabling secure access to internal, external, and DMZ zones. By completing this project, I gained hands-on experience in configuring essential ASA features like routing, PAT, ACLs, AAA authentication, and SSH.
+
+The integration of a DMZ and static NAT configuration to support a public-facing web server highlights the ASA's capabilities in balancing security and accessibility. Through extensive testing and verification, including connectivity checks and policy inspections, the ASA configuration proved to be effective and robust.
+
+This project reinforces the importance of properly segmenting network zones and implementing granular security policies for modern network infrastructures. These skills are crucial for designing, deploying, and managing secure enterprise networks.
